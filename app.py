@@ -1,25 +1,22 @@
 import os
 
 import bcrypt
-import MySQLdb  # perubahan disini
+import MySQLdb
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_mysqldb import MySQL
 
-# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 
-app.secret_key = os.environ.get(
-    "SECRET_KEY", "hhjG664H5SD2Ykj4sh35a71u2wba68s34d72H211Jj2hHA"
-)
+app.secret_key = os.environ.get("SECRET_KEY")
 
 # Konfigurasi database menggunakan variabel lingkungan
-app.config["MYSQL_HOST"] = os.environ.get("MYSQL_HOST", "127.0.0.1")
-app.config["MYSQL_USER"] = os.environ.get("MYSQL_USER", "root")
-app.config["MYSQL_PASSWORD"] = os.environ.get("MYSQL_PASSWORD", "")
-app.config["MYSQL_DB"] = os.environ.get("MYSQL_DB", "db_spk")
+app.config["MYSQL_HOST"] = os.environ.get("MYSQL_HOST")
+app.config["MYSQL_USER"] = os.environ.get("MYSQL_USER")
+app.config["MYSQL_PASSWORD"] = os.environ.get("MYSQL_PASSWORD")
+app.config["MYSQL_DB"] = os.environ.get("MYSQL_DB")
 
 mysql = MySQL(app)
 

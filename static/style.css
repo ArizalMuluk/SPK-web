@@ -65,26 +65,6 @@ body {
     min-height: 100vh;
 }
 
-/* Theme Toggle Button */
-.theme-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 10px;
-    border-radius: 50%;
-    background: linear-gradient(45deg, var(--primary-light) 0%, var(--secondary-light) 100%);
-    border: none;
-    cursor: pointer;
-    z-index: 1000;
-    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-    color: white;
-}
-
-.theme-toggle:hover {
-    transform: rotate(180deg);
-    background: linear-gradient(45deg, var(--secondary-light) 0%, var(--primary-light) 100%);
-}
-
 /* Auth Forms (Login & Register) */
 .container {
     display: flex;
@@ -124,6 +104,9 @@ body {
         var(--primary-light)
     );
     -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    mask: 
         linear-gradient(#fff 0 0) content-box, 
         linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -260,6 +243,7 @@ body {
     color: var(--sidebar-text-light);
     border-right: 1px solid var(--border-light);
     padding: 20px;
+    transition: transform 0.3s ease;
 }
 
 .main-content {
@@ -401,6 +385,7 @@ body {
     color: var(--text-color);
     font-size: 24px;
     font-weight: 600;
+    margin-top: 50px;
 }
 
 .user-info {
@@ -515,6 +500,10 @@ body {
     .sidebar-toggle {
         display: block;
     }
+    
+    .page-title {
+        margin-top: 40px;
+    }
 
     .content-header {
         flex-direction: column;
@@ -594,4 +583,18 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--secondary-color);
+}
+
+/* Sidebar Toggle Button Animation */
+.sidebar-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.sidebar-toggle.active i {
+    transform: rotate(180deg);
+}
+
+/* Tambahkan animasi untuk sidebar */
+.sidebar.active {
+    transform: translateX(0);
 }

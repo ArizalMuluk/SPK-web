@@ -598,3 +598,79 @@ body {
 .sidebar.active {
     transform: translateX(0);
 }
+
+/* Menghilangkan underline pada menu sidebar */
+.sidebar .menu-item {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+/* Styling untuk container pengaturan tema */
+.settings-container {
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.settings-card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+}
+
+.settings-title {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theme-selector {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.theme-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid var(--border-color);
+    background: var(--card-bg);
+    width: 150px;
+}
+
+.theme-option i {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.theme-option.light-theme {
+    color: #FFB74D;
+}
+
+.theme-option.dark-theme {
+    color: #7986CB;
+}
+
+.theme-option:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+}
+
+.theme-option.active {
+    border-color: var(--primary-color);
+    background: rgba(var(--primary-color), 0.1);
+}

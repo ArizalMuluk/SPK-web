@@ -885,25 +885,35 @@ table.dataTable tbody td {
 }
 
 /* Styling untuk pesan "No data available in table" */
-table.dataTable tbody tr.odd td.dataTables_empty,
-table.dataTable tbody tr.even td.dataTables_empty {
-    text-align: center;
-    padding: 20px;
-    color: var(--text-color);
+table.dataTable tbody tr.odd {
+    background-color: var(--bg-color);
 }
 
-/* Dark mode adjustment untuk pesan empty table */
-.dark-mode table.dataTable tbody tr.odd td.dataTables_empty,
-.dark-mode table.dataTable tbody tr.even td.dataTables_empty {
+table.dataTable.display tbody tr.odd > .sorting_1, 
+table.dataTable.order-column.stripe tbody tr.odd > .sorting_1 {
+    background-color: var(--bg-color);
+}
+
+/* Dark mode adjustments untuk pesan kosong */
+.dark-mode table.dataTable tbody tr.odd {
+    background-color: var(--card-bg-dark);
+}
+
+.dark-mode table.dataTable.display tbody tr.odd > .sorting_1,
+.dark-mode table.dataTable.order-column.stripe tbody tr.odd > .sorting_1 {
+    background-color: var(--card-bg-dark);
+}
+
+.dark-mode table.dataTable td.dataTables_empty {
     color: var(--text-dark);
     background-color: var(--card-bg-dark);
 }
 
-/* Styling untuk semua teks dalam DataTables */
-.dataTables_wrapper {
+/* Styling untuk pesan kosong */
+.dataTables_empty {
     color: var(--text-color);
-}
-
-.dark-mode .dataTables_wrapper {
-    color: var(--text-dark);
+    padding: 20px !important;
+    font-style: italic;
+    text-align: center;
+    background-color: var(--bg-color);
 }

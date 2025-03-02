@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lihat Data SPK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Tambahkan DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
+</head>
+<body>
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>SPK Dashboard</h3>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/data" class="menu-item active">
+                <i class="fas fa-chart-bar"></i>
+                <span>Lihat Data</span>
+            </a>
+            <a href="/add" class="menu-item">
+                <i class="fas fa-plus-circle"></i>
+                <span>Tambah Data</span>
+            </a>
+            <a href="/calculation" class="menu-item">
+                <i class="fas fa-calculator"></i>
+                <span>Perhitungan</span>
+            </a>
+            <a href="/analysis" class="menu-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Hasil Analisis</span>
+            </a>
+            <a href="/settings" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Pengaturan</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="content-header">
+            <h2 class="page-title">Lihat Data</h2>
+            <div class="user-info">
+                <span>Selamat datang, <strong>{{ username }}</strong></span>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Data Tables Section -->
+        <div class="data-section">
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="tab-btn active" data-tab="aspirasi">Data Aspirasi</button>
+                <button class="tab-btn" data-tab="dosen">Data Dosen</button>
+                <button class="tab-btn" data-tab="kriteria">Data Kriteria</button>
+                <button class="tab-btn" data-tab="penilaian">Data Penilaian</button>
+            </div>
+
+            <!-- Aspirasi Table -->
+            <div class="tab-content active" id="aspirasi">
+                <div class="table-container">
+                    <h3>Data Aspirasi Mahasiswa</h3>
+                    <table id="aspirasiTable" class="display responsive nowrap">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>NIM</th>
+                                <th>Deskripsi</th>
+                                <th>Tanggal</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for aspirasi in aspirasi_data %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ aspirasi.nim }}</td>
+                                <td>{{ aspirasi.deskripsi }}</td>
+                                <td>{{ aspirasi.tanggal }}</td>
+                                <td>
+                                    <button class="btn-edit" data-id="{{ aspirasi.id_aspirasi }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-delete" data-id="{{ aspirasi.id_aspirasi }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Dosen Table -->
+            <div class="tab-content" id="dosen">
+                <div class="table-container">
+                    <h3>Data Dosen</h3>
+                    <table id="dosenTable" class="display responsive nowrap">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>NID</th>
+                                <th>Nama</th>
+                                <th>Mata Kuliah</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dosen in dosen_data %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ dosen.nid }}</td>
+                                <td>{{ dosen.nama }}</td>
+                                <td>{{ dosen.matkul }}</td>
+                                <td>
+                                    <button class="btn-edit" data-id="{{ dosen.id_dosen }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-delete" data-id="{{ dosen.id_dosen }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Kriteria Table -->
+            <div class="tab-content" id="kriteria">
+                <div class="table-container">
+                    <h3>Data Kriteria</h3>
+                    <table id="kriteriaTable" class="display responsive nowrap">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Kriteria</th>
+                                <th>Bobot</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for kriteria in kriteria_data %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ kriteria.nama_kriteria }}</td>
+                                <td>{{ kriteria.bobot }}</td>
+                                <td>
+                                    <button class="btn-edit" data-id="{{ kriteria.id_kriteria }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-delete" data-id="{{ kriteria.id_kriteria }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Penilaian Table -->
+            <div class="tab-content" id="penilaian">
+                <div class="table-container">
+                    <h3>Data Penilaian</h3>
+                    <table id="penilaianTable" class="display responsive nowrap">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>NIM</th>
+                                <th>Dosen</th>
+                                <th>Kriteria</th>
+                                <th>Nilai</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for penilaian in penilaian_data %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ penilaian.nim }}</td>
+                                <td>{{ penilaian.nama_dosen }}</td>
+                                <td>{{ penilaian.nama_kriteria }}</td>
+                                <td>{{ penilaian.nilai }}</td>
+                                <td>
+                                    <button class="btn-edit" data-id="{{ penilaian.id_penilaian }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-delete" data-id="{{ penilaian.id_penilaian }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    
+    <script>
+        // Initialize DataTables
+        $(document).ready(function() {
+            $('#aspirasiTable').DataTable({
+                responsive: true
+            });
+            $('#dosenTable').DataTable({
+                responsive: true
+            });
+            $('#kriteriaTable').DataTable({
+                responsive: true
+            });
+            $('#penilaianTable').DataTable({
+                responsive: true
+            });
+        });
+
+        // Tab Navigation
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                
+                // Remove active class from all buttons and contents
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding content
+                btn.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            sidebar.classList.toggle('active');
+            mainContent.classList.toggle('sidebar-active');
+        });
+    </script>
+</body>
+</html>

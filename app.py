@@ -119,7 +119,49 @@ def view_data():
         flash("Silakan login terlebih dahulu.", "error")
         return redirect(url_for("login"))
 
-    return render_template("data.html", username=session.get("username"))
+    cursor = mysql.connection.cursor()
+
+    # Fetch Aspirasi Data
+    cursor.execute(
+        """
+        SELECT a.id_aspirasi, m.nim, a.deskripsi, a.tanggal 
+        FROM tbl_aspirasi a 
+        JOIN tbl_mahasiswa m ON a.id_mahasiswa = m.id_mahasiswa
+    """
+    )
+    aspirasi_data = cursor.fetchall()
+
+    # Fetch Dosen Data
+    cursor.execute("SELECT * FROM tbl_dosen")
+    dosen_data = cursor.fetchall()
+
+    # Fetch Kriteria Data
+    cursor.execute("SELECT * FROM tbl_kriteria")
+    kriteria_data = cursor.fetchall()
+
+    # Fetch Penilaian Data with related information
+    cursor.execute(
+        """
+        SELECT p.id_penilaian, m.nim, d.nama as nama_dosen, 
+               k.nama_kriteria, p.nilai
+        FROM tbl_penilaian p
+        JOIN tbl_mahasiswa m ON p.id_mahasiswa = m.id_mahasiswa
+        JOIN tbl_dosen d ON p.id_dosen = d.id_dosen
+        JOIN tbl_kriteria k ON p.id_kriteria = k.id_kriteria
+    """
+    )
+    penilaian_data = cursor.fetchall()
+
+    cursor.close()
+
+    return render_template(
+        "dt_view.html",
+        username=session.get("username"),
+        aspirasi_data=aspirasi_data,
+        dosen_data=dosen_data,
+        kriteria_data=kriteria_data,
+        penilaian_data=penilaian_data,
+    )
 
 
 @app.route("/add")

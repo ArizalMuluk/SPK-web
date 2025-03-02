@@ -137,6 +137,13 @@
         const savedTheme = localStorage.getItem('theme') || 'light';
         body.classList.add(`${savedTheme}-mode`);
         
+        // Pastikan ikon tombol tema sesuai dengan tema yang aktif
+        if (savedTheme === 'dark') {
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        }
+        
         themeToggle.addEventListener('click', () => {
             if (body.classList.contains('light-mode')) {
                 body.classList.replace('light-mode', 'dark-mode');

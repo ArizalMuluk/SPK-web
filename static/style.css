@@ -30,6 +30,16 @@
 }
 
 /* Theme Classes */
+html {
+    --bg-color: var(--bg-light);
+    --text-color: var(--text-light);
+    --primary-color: var(--primary-light);
+    --secondary-color: var(--secondary-light);
+    --card-bg: var(--card-bg-light);
+    --border-color: var(--border-light);
+    --shadow: var(--shadow-light);
+}
+
 .light-mode {
     --bg-color: var(--bg-light);
     --text-color: var(--text-light);

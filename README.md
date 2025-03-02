@@ -23,27 +23,30 @@ This application is a decision support system that allows users to manage aspira
 ## Installation Guide
 
 ### 1. Clone Repository
-bash
+```bash
 git clone https://github.com/ArizalMuluk/SPK-web.git
 cd SPK-web
+```
 
 ### 2. Activate Virtual Environment
-bash
+```bash
 source venv/bin/activate
+```
 
-### 4. Database Configuration
+### 3. Database Configuration
 - Create a new MySQL database
-- Copy the .env.example file to .env
-- Edit the .env file and adjust it to your database configuration:
-bash
+- Copy the `.env.example` file to `.env`
+- Edit the `.env` file and adjust it to your database configuration:
+```bash
 SECRET_KEY=your-secret-key
 MYSQL_HOST=localhost
 MYSQL_USER=your-mysql-username
 MYSQL_PASSWORD=your-mysql-password
 MYSQL_DB=your-database-name
+```
 
-### 5. Create Database Structure
-bash
+### 4. Create Database Structure
+```bash
 CREATE TABLE tbl_mahasiswa (
     id_mahasiswa INT AUTO_INCREMENT PRIMARY KEY,
     nim VARCHAR(20) UNIQUE NOT NULL,
@@ -81,12 +84,14 @@ CREATE TABLE tbl_penilaian (
     FOREIGN KEY (id_dosen) REFERENCES tbl_dosen(id_dosen),
     FOREIGN KEY (id_kriteria) REFERENCES tbl_kriteria(id_kriteria)
 );
+```
 
-### 6. Run the Application
-bash
+### 5. Run the Application
+```bash
 python app.py
+```
 
-The application will run at http://localhost:8080 (or the port specified in the .env file).
+The application will run at [http://localhost:8080](http://localhost:8080) (or the port specified in the `.env` file).
 
 ## Usage
 

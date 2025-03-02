@@ -10,6 +10,11 @@
     <!-- Tambahkan DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
+    <script>
+        // Terapkan tema yang tersimpan sebelum halaman dimuat untuk menghindari flicker
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.className = savedTheme + '-mode';
+    </script>
 </head>
 <body>
     <!-- Sidebar Toggle Button -->
@@ -225,6 +230,11 @@
         </div>
     </div>
 
+    <!-- Tombol Toggle Tema -->
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
@@ -271,6 +281,37 @@
             const mainContent = document.getElementById('mainContent');
             sidebar.classList.toggle('active');
             mainContent.classList.toggle('sidebar-active');
+        });
+
+        // Theme Switcher
+        function setTheme(theme) {
+            const body = document.documentElement;
+            const themeToggle = document.getElementById('themeToggle');
+            
+            if (theme === 'dark') {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+            
+            localStorage.setItem('theme', theme);
+        }
+
+        // Toggle tema saat tombol diklik
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+        });
+
+        // Set tema yang tersimpan saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
         });
     </script>
 </body>

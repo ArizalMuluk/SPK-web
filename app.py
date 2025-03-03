@@ -4,7 +4,16 @@ import bcrypt
 import MySQLdb
 import numpy as np
 from dotenv import load_dotenv
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import (
+    Flask,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_mysqldb import MySQL
 
 load_dotenv()
@@ -191,13 +200,15 @@ def view_data():
         return redirect(url_for("login"))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    
+
     # Fetch Aspirasi Data
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT a.id_aspirasi, m.nim, a.deskripsi, a.tanggal 
         FROM tbl_aspirasi a 
         JOIN tbl_mahasiswa m ON a.id_mahasiswa = m.id_mahasiswa
-    """)
+    """
+    )
     aspirasi_data = cursor.fetchall()
 
     # Fetch Dosen Data
@@ -209,14 +220,16 @@ def view_data():
     kriteria_data = cursor.fetchall()
 
     # Fetch Penilaian Data with related information (hapus kolom tanggal)
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT p.id_penilaian, m.nim, d.nama as nama_dosen, 
                k.nama_kriteria, p.nilai
         FROM tbl_penilaian p
         JOIN tbl_mahasiswa m ON p.id_mahasiswa = m.id_mahasiswa
         JOIN tbl_dosen d ON p.id_dosen = d.id_dosen
         JOIN tbl_kriteria k ON p.id_kriteria = k.id_kriteria
-    """)
+    """
+    )
     penilaian_data = cursor.fetchall()
 
     cursor.close()
@@ -227,7 +240,7 @@ def view_data():
         aspirasi_data=aspirasi_data,
         dosen_data=dosen_data,
         kriteria_data=kriteria_data,
-        penilaian_data=penilaian_data
+        penilaian_data=penilaian_data,
     )
 
 
@@ -277,8 +290,8 @@ def add_dosen():
 
         cursor = mysql.connection.cursor()
         cursor.execute(
-            "INSERT INTO tbl_dosen (nama, nid, matkul) VALUES (%s, %s, %s)", 
-            (nama_dosen, nid, matkul)
+            "INSERT INTO tbl_dosen (nama, nid, matkul) VALUES (%s, %s, %s)",
+            (nama_dosen, nid, matkul),
         )
 
         mysql.connection.commit()
@@ -332,71 +345,52 @@ def calculate_weights(comparison_matrix):
 
 @app.route("/add/kriteria", methods=["POST"])
 def add_kriteria():
-    if not session.get("logged_in"):
-        flash("Silakan login terlebih dahulu.", "error")
+    if not session.get("logged_in") or session.get("role") != "admin":
+        flash("Hanya admin yang dapat mengakses fitur ini.", "error")
         return redirect(url_for("login"))
 
     try:
         kriteria_names = request.form.getlist("kriteria_name[]")
         bobots = request.form.getlist("bobot[]")
+        jenis_list = request.form.getlist("jenis[]")
+        min_values = request.form.getlist("min_nilai[]")
+        max_values = request.form.getlist("max_nilai[]")
 
         # Validasi total bobot = 100
-        total_bobot = sum(int(bobot) for bobot in bobots)
+        total_bobot = sum(float(bobot) for bobot in bobots)
         if total_bobot != 100:
             flash("Total bobot harus 100%", "error")
             return redirect(url_for("add_data"))
 
         cursor = mysql.connection.cursor()
-        
+
         # Simpan setiap kriteria
-        for name, bobot in zip(kriteria_names, bobots):
+        for name, bobot, jenis, min_val, max_val in zip(
+            kriteria_names, bobots, jenis_list, min_values, max_values
+        ):
             cursor.execute(
-                "INSERT INTO tbl_kriteria (nama_kriteria, bobot) VALUES (%s, %s)",
-                (name, float(bobot)/100)  # Konversi persen ke desimal
+                """INSERT INTO tbl_kriteria 
+                   (nama_kriteria, bobot, jenis, min_nilai, max_nilai) 
+                   VALUES (%s, %s, %s, %s, %s)""",
+                (name, float(bobot) / 100, jenis, min_val, max_val),
             )
+            kriteria_id = cursor.lastrowid
+
+            # Simpan deskripsi untuk setiap nilai
+            for nilai in range(int(min_val), int(max_val) + 1):
+                deskripsi = request.form.get(f"nilai_desc_{nilai-int(min_val)}[]")
+                if deskripsi:
+                    cursor.execute(
+                        """INSERT INTO tbl_nilai_deskripsi 
+                           (id_kriteria, nilai, deskripsi) 
+                           VALUES (%s, %s, %s)""",
+                        (kriteria_id, nilai, deskripsi),
+                    )
 
         mysql.connection.commit()
         cursor.close()
-
         flash("Kriteria berhasil ditambahkan!", "success")
-    except Exception as e:
-        flash(f"Terjadi kesalahan: {str(e)}", "error")
 
-    return redirect(url_for("add_data"))
-
-
-@app.route("/add/penilaian", methods=["POST"])
-def add_penilaian():
-    if not session.get("logged_in"):
-        flash("Silakan login terlebih dahulu.", "error")
-        return redirect(url_for("login"))
-
-    try:
-        id_dosen = request.form["dosen"]
-        id_kriteria = request.form["kriteria"]
-        nilai = request.form["nilai"]
-
-        cursor = mysql.connection.cursor()
-
-        # Dapatkan id_mahasiswa dari session username (NIM)
-        cursor.execute(
-            "SELECT id_mahasiswa FROM tbl_mahasiswa WHERE nim = %s",
-            (session["username"],),
-        )
-        id_mahasiswa = cursor.fetchone()[0]
-
-        # Insert penilaian
-        cursor.execute(
-            """INSERT INTO tbl_penilaian 
-               (id_mahasiswa, id_dosen, id_kriteria, nilai, tanggal) 
-               VALUES (%s, %s, %s, %s, NOW())""",
-            (id_mahasiswa, id_dosen, id_kriteria, nilai),
-        )
-
-        mysql.connection.commit()
-        cursor.close()
-
-        flash("Penilaian berhasil ditambahkan!", "success")
     except Exception as e:
         flash(f"Terjadi kesalahan: {str(e)}", "error")
 
@@ -605,6 +599,220 @@ def add_mahasiswa_penilaian():
         flash(f"Terjadi kesalahan: {str(e)}", "error")
 
     return redirect(url_for("mahasiswa_penilaian"))
+
+
+# Route untuk menghapus data
+@app.route("/delete/<string:table>/<int:id>", methods=["POST"])
+def delete_data(table, id):
+    if not session.get("logged_in") or session.get("role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    try:
+        cursor = mysql.connection.cursor()
+
+        # Map table name ke nama tabel dan kolom ID yang sesuai
+        table_map = {
+            "aspirasi": ("tbl_aspirasi", "id_aspirasi"),
+            "dosen": ("tbl_dosen", "id_dosen"),
+            "kriteria": ("tbl_kriteria", "id_kriteria"),
+            "penilaian": ("tbl_penilaian", "id_penilaian"),
+        }
+
+        if table not in table_map:
+            return jsonify({"status": "error", "message": "Invalid table"}), 400
+
+        table_name, id_column = table_map[table]
+
+        # Eksekusi query delete
+        cursor.execute(f"DELETE FROM {table_name} WHERE {id_column} = %s", (id,))
+        mysql.connection.commit()
+        cursor.close()
+
+        return jsonify(
+            {"status": "success", "message": f"Data {table} berhasil dihapus"}
+        )
+
+    except Exception as e:
+        return (
+            jsonify({"status": "error", "message": f"Terjadi kesalahan: {str(e)}"}),
+            500,
+        )
+
+
+# Route untuk mengambil data untuk edit
+@app.route("/get_data/<string:table>/<int:id>")
+def get_data(table, id):
+    if not session.get("logged_in") or session.get("role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    try:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+        # Map table name ke query yang sesuai
+        table_queries = {
+            "aspirasi": "SELECT * FROM tbl_aspirasi WHERE id_aspirasi = %s",
+            "dosen": "SELECT * FROM tbl_dosen WHERE id_dosen = %s",
+            "kriteria": "SELECT * FROM tbl_kriteria WHERE id_kriteria = %s",
+            "penilaian": """
+                SELECT p.*, d.nama as nama_dosen, k.nama_kriteria 
+                FROM tbl_penilaian p
+                JOIN tbl_dosen d ON p.id_dosen = d.id_dosen
+                JOIN tbl_kriteria k ON p.id_kriteria = k.id_kriteria
+                WHERE p.id_penilaian = %s
+            """,
+        }
+
+        if table not in table_queries:
+            return jsonify({"status": "error", "message": "Invalid table"}), 400
+
+        cursor.execute(table_queries[table], (id,))
+        data = cursor.fetchone()
+        cursor.close()
+
+        if data:
+            return jsonify({"status": "success", "data": data})
+        else:
+            return jsonify({"status": "error", "message": "Data not found"}), 404
+
+    except Exception as e:
+        return (
+            jsonify({"status": "error", "message": f"Terjadi kesalahan: {str(e)}"}),
+            500,
+        )
+
+
+# Route untuk update data
+@app.route("/update/<string:table>/<int:id>", methods=["POST"])
+def update_data(table, id):
+    if not session.get("logged_in") or session.get("role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    try:
+        cursor = mysql.connection.cursor()
+        data = request.form.to_dict()
+
+        # Map table name ke query update yang sesuai
+        update_queries = {
+            "aspirasi": """
+                UPDATE tbl_aspirasi 
+                SET deskripsi = %s
+                WHERE id_aspirasi = %s
+            """,
+            "dosen": """
+                UPDATE tbl_dosen 
+                SET nama = %s, nid = %s, matkul = %s
+                WHERE id_dosen = %s
+            """,
+            "kriteria": """
+                UPDATE tbl_kriteria 
+                SET nama_kriteria = %s, bobot = %s
+                WHERE id_kriteria = %s
+            """,
+            "penilaian": """
+                UPDATE tbl_penilaian 
+                SET nilai = %s
+                WHERE id_penilaian = %s
+            """,
+        }
+
+        if table not in update_queries:
+            return jsonify({"status": "error", "message": "Invalid table"}), 400
+
+        # Prepare parameters based on table
+        params = {
+            "aspirasi": (data["deskripsi"], id),
+            "dosen": (data["nama"], data["nid"], data["matkul"], id),
+            "kriteria": (data["nama_kriteria"], data["bobot"], id),
+            "penilaian": (data["nilai"], id),
+        }
+
+        cursor.execute(update_queries[table], params[table])
+        mysql.connection.commit()
+        cursor.close()
+
+        return jsonify(
+            {"status": "success", "message": f"Data {table} berhasil diupdate"}
+        )
+
+    except Exception as e:
+        return (
+            jsonify({"status": "error", "message": f"Terjadi kesalahan: {str(e)}"}),
+            500,
+        )
+
+
+@app.route("/get_deskripsi_nilai/<int:kriteria_id>")
+def get_deskripsi_nilai(kriteria_id):
+    if not session.get("logged_in") or session.get("role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    try:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(
+            """SELECT nilai, deskripsi 
+               FROM tbl_nilai_deskripsi 
+               WHERE id_kriteria = %s 
+               ORDER BY nilai""",
+            (kriteria_id,),
+        )
+        deskripsi_list = cursor.fetchall()
+        cursor.close()
+
+        return jsonify(deskripsi_list)
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+# Update route update_data untuk kriteria
+@app.route("/update/kriteria/<int:id>", methods=["POST"])
+def update_kriteria(id):
+    if not session.get("logged_in") or session.get("role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    try:
+        cursor = mysql.connection.cursor()
+        data = request.form
+
+        # Update kriteria
+        cursor.execute(
+            """UPDATE tbl_kriteria 
+               SET nama_kriteria = %s, 
+                   bobot = %s,
+                   jenis = %s,
+                   min_nilai = %s,
+                   max_nilai = %s
+               WHERE id_kriteria = %s""",
+            (
+                data["kriteria_name"],
+                float(data["bobot"]) / 100,
+                data["jenis"],
+                data["min_nilai"],
+                data["max_nilai"],
+                id,
+            ),
+        )
+
+        # Update deskripsi nilai
+        cursor.execute("DELETE FROM tbl_nilai_deskripsi WHERE id_kriteria = %s", (id,))
+
+        for nilai in range(int(data["min_nilai"]), int(data["max_nilai"]) + 1):
+            deskripsi = data.get(f"nilai_desc_{nilai}")
+            if deskripsi:
+                cursor.execute(
+                    """INSERT INTO tbl_nilai_deskripsi 
+                       (id_kriteria, nilai, deskripsi) 
+                       VALUES (%s, %s, %s)""",
+                    (id, nilai, deskripsi),
+                )
+
+        mysql.connection.commit()
+        cursor.close()
+
+        return jsonify({"status": "success", "message": "Kriteria berhasil diupdate"})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
 if __name__ == "__main__":

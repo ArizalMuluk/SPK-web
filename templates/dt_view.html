@@ -10,6 +10,7 @@
     <!-- Tambahkan DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script>
         // Terapkan tema yang tersimpan sebelum halaman dimuat untuk menghindari flicker
         const savedTheme = localStorage.getItem('theme') || 'light';
@@ -106,10 +107,10 @@
                                 <td>{{ aspirasi.deskripsi }}</td>
                                 <td>{{ aspirasi.tanggal }}</td>
                                 <td>
-                                    <button class="btn-edit" data-id="{{ aspirasi.id_aspirasi }}">
+                                    <button class="btn-edit" data-table="aspirasi" data-id="{{ aspirasi.id_aspirasi }}">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn-delete" data-id="{{ aspirasi.id_aspirasi }}">
+                                    <button class="btn-delete" data-table="aspirasi" data-id="{{ aspirasi.id_aspirasi }}">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -142,10 +143,10 @@
                                 <td>{{ dosen.nama }}</td>
                                 <td>{{ dosen.matkul }}</td>
                                 <td>
-                                    <button class="btn-edit" data-id="{{ dosen.id_dosen }}">
+                                    <button class="btn-edit" data-table="dosen" data-id="{{ dosen.id_dosen }}">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn-delete" data-id="{{ dosen.id_dosen }}">
+                                    <button class="btn-delete" data-table="dosen" data-id="{{ dosen.id_dosen }}">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -166,6 +167,7 @@
                                 <th>No</th>
                                 <th>Nama Kriteria</th>
                                 <th>Bobot</th>
+                                <th>Jenis</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -174,12 +176,13 @@
                             <tr>
                                 <td>{{ loop.index }}</td>
                                 <td>{{ kriteria.nama_kriteria }}</td>
-                                <td>{{ kriteria.bobot }}</td>
+                                <td>{{ "%.0f"|format(kriteria.bobot * 100) }}%</td>
+                                <td>{{ kriteria.jenis }}</td>
                                 <td>
-                                    <button class="btn-edit" data-id="{{ kriteria.id_kriteria }}">
+                                    <button onclick="editKriteria({{ kriteria.id_kriteria }})" class="btn-edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn-delete" data-id="{{ kriteria.id_kriteria }}">
+                                    <button class="btn-delete" data-table="kriteria" data-id="{{ kriteria.id_kriteria }}">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -214,10 +217,10 @@
                                 <td>{{ penilaian.nama_kriteria }}</td>
                                 <td>{{ penilaian.nilai }}</td>
                                 <td>
-                                    <button class="btn-edit" data-id="{{ penilaian.id_penilaian }}">
+                                    <button class="btn-edit" data-table="penilaian" data-id="{{ penilaian.id_penilaian }}">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn-delete" data-id="{{ penilaian.id_penilaian }}">
+                                    <button class="btn-delete" data-table="penilaian" data-id="{{ penilaian.id_penilaian }}">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -235,10 +238,87 @@
         <i class="fas fa-moon"></i>
     </button>
 
+    <!-- Update modal edit untuk Data Dosen -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Data Dosen</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <div class="form-group">
+                            <label>Nama:</label>
+                            <input type="text" name="nama" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>NID:</label>
+                            <input type="text" name="nid" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mata Kuliah:</label>
+                            <input type="text" name="matkul" class="form-control" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="saveChanges()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Kriteria -->
+    <div class="modal fade" id="editKriteriaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Kriteria</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="editKriteriaForm">
+                        <div class="form-group">
+                            <div class="kriteria-header">
+                                <label>Nama Kriteria:</label>
+                                <input type="text" name="kriteria_name" required>
+                                <input type="number" name="bobot" placeholder="Bobot (%)" required min="1" max="100">
+                                <select name="jenis" required>
+                                    <option value="">Pilih Jenis</option>
+                                    <option value="benefit">Benefit</option>
+                                    <option value="cost">Cost</option>
+                                </select>
+                            </div>
+                            
+                            <div class="range-nilai">
+                                <label>Range Nilai:</label>
+                                <div class="range-inputs">
+                                    <input type="number" name="min_nilai" placeholder="Min" required min="1" max="10">
+                                    <span>sampai</span>
+                                    <input type="number" name="max_nilai" placeholder="Max" required min="1" max="10">
+                                </div>
+                                <div class="nilai-descriptions">
+                                    <!-- Deskripsi nilai akan ditambahkan di sini -->
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="updateKriteria()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
         // Initialize DataTables
@@ -312,6 +392,190 @@
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
             setTheme(savedTheme);
+        });
+
+        // Fungsi untuk menghapus data
+        function deleteData(table, id) {
+            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                fetch(`/delete/${table}/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat menghapus data');
+                });
+            }
+        }
+
+        // Fungsi untuk membuka modal edit
+        function openEditModal(table, id) {
+            fetch(`/get_data/${table}/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const form = document.getElementById('editForm');
+                        
+                        // Isi form dengan data yang ada
+                        if (table === 'dosen') {
+                            form.querySelector('[name="nama"]').value = data.data.nama;
+                            form.querySelector('[name="nid"]').value = data.data.nid;
+                            form.querySelector('[name="matkul"]').value = data.data.matkul;
+                            
+                            // Simpan table dan id untuk digunakan saat update
+                            form.dataset.table = table;
+                            form.dataset.id = id;
+                            
+                            // Tampilkan modal
+                            $('#editModal').modal('show');
+                        }
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat mengambil data');
+                });
+        }
+
+        // Fungsi untuk menyimpan perubahan
+        function saveChanges() {
+            const form = document.getElementById('editForm');
+            const table = form.dataset.table;
+            const id = form.dataset.id;
+            const formData = new FormData(form);
+            
+            fetch(`/update/${table}/${id}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    $('#editModal').modal('hide');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat menyimpan data');
+            });
+        }
+
+        // Event handler untuk tombol edit
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                if (btn.closest('#kriteria')) return; // Skip untuk tombol di tabel kriteria
+                btn.addEventListener('click', function() {
+                    openEditModal(this.dataset.table, this.dataset.id);
+                });
+            });
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Fungsi untuk edit kriteria
+        function editKriteria(id) {
+            fetch(`/get_data/kriteria/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const kriteria = data.data;
+                        const form = document.getElementById('editKriteriaForm');
+                        
+                        // Isi form dengan data yang ada
+                        form.querySelector('[name="kriteria_name"]').value = kriteria.nama_kriteria;
+                        form.querySelector('[name="bobot"]').value = Math.round(kriteria.bobot * 100);
+                        form.querySelector('[name="jenis"]').value = kriteria.jenis;
+                        form.querySelector('[name="min_nilai"]').value = kriteria.min_nilai;
+                        form.querySelector('[name="max_nilai"]').value = kriteria.max_nilai;
+                        
+                        // Ambil deskripsi nilai
+                        fetch(`/get_deskripsi_nilai/${id}`)
+                            .then(response => response.json())
+                            .then(deskData => {
+                                const container = form.querySelector('.nilai-descriptions');
+                                container.innerHTML = '';
+                                
+                                deskData.forEach(desk => {
+                                    const div = document.createElement('div');
+                                    div.className = 'desc-group';
+                                    div.innerHTML = `
+                                        <label>Deskripsi untuk nilai ${desk.nilai}:</label>
+                                        <input type="text" 
+                                               name="nilai_desc_${desk.nilai}" 
+                                               value="${desk.deskripsi}"
+                                               required>
+                                    `;
+                                    container.appendChild(div);
+                                });
+                            });
+                        
+                            // Simpan ID untuk digunakan saat update
+                            form.dataset.kriteriaId = id;
+                            
+                            // Tampilkan modal
+                            $('#editKriteriaModal').modal('show');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengambil data');
+                    });
+                }
+
+        // Fungsi untuk update kriteria
+        function updateKriteria() {
+            const form = document.getElementById('editKriteriaForm');
+            const id = form.dataset.kriteriaId;
+            const formData = new FormData(form);
+            
+            fetch(`/update/kriteria/${id}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    $('#editKriteriaModal').modal('hide');
+                    location.reload(); // Refresh halaman untuk menampilkan perubahan
+                } else {
+                    alert('Gagal mengupdate data: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat mengupdate data');
+            });
+        }
+
+        // Inisialisasi modal saat dokumen siap
+        $(document).ready(function() {
+            $('#editKriteriaModal').modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: false
+            });
         });
     </script>
 </body>

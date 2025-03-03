@@ -27,6 +27,8 @@
     --shadow-dark: 0 2px 10px rgba(0,0,0,0.3);
     --sidebar-bg-dark: linear-gradient(135deg, #1A237E 0%, #0D47A1 100%);
     --sidebar-text-dark: #ffffff;
+    --input-bg-dark: #2d2d2d;
+    --secondary-dark: #4a4a4a;
 }
 
 /* Theme Classes */
@@ -820,27 +822,33 @@ table.dataTable thead th {
     background-color: #333333 !important;
 }
 
+/* Button styles untuk dt_view.html */
 .btn-edit, .btn-delete {
-    padding: 6px 12px;
+    padding: 5px 10px;
+    margin: 0 5px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin: 0 5px;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s;
 }
 
 .btn-edit {
-    background: var(--primary-color);
+    background-color: var(--primary-light);
     color: white;
 }
 
 .btn-delete {
-    background: var(--danger-light);
+    background-color: var(--danger-light);
     color: white;
 }
 
-.btn-edit:hover, .btn-delete:hover {
-    opacity: 0.8;
+.btn-edit:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.btn-delete:hover {
+    background-color: var(--danger-dark);
     transform: translateY(-2px);
 }
 
@@ -945,4 +953,489 @@ table.dataTable.order-column.stripe tbody tr.odd > .sorting_1 {
     font-style: italic;
     text-align: center;
     background-color: var(--bg-color);
+}
+
+/* Modal styles untuk dt_view.html */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: var(--bg-color);
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: var(--primary-color);
+}
+
+/* Form styles untuk modal edit */
+.modal .form-group {
+    margin-bottom: 15px;
+}
+
+.modal .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.modal .form-group input,
+.modal .form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.modal .form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.modal .submit-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.modal .submit-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Dark mode adjustments untuk modal */
+.dark-mode .modal-content {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+    border: 1px solid var(--border-dark);
+}
+
+.dark-mode .modal-header {
+    border-bottom: 1px solid var(--border-dark);
+    background-color: var(--card-bg-dark);
+}
+
+.dark-mode .modal-footer {
+    border-top: 1px solid var(--border-dark);
+    background-color: var(--card-bg-dark);
+}
+
+.dark-mode .close {
+    color: var(--text-dark);
+    text-shadow: none;
+}
+
+.dark-mode .modal-body input,
+.dark-mode .modal-body select,
+.dark-mode .modal-body textarea {
+    background-color: var(--input-bg-dark);
+    color: var(--text-dark);
+    border: 1px solid var(--border-dark);
+}
+
+.dark-mode .btn-secondary {
+    background-color: var(--secondary-dark);
+    border-color: var(--border-dark);
+}
+
+.dark-mode .btn-primary {
+    background-color: var(--primary-dark);
+    border-color: var(--border-dark);
+}
+
+/* Form Styling */
+.form-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.form-section {
+    display: none;
+    background-color: transparent;
+}
+
+.form-section.active {
+    display: block;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    position: relative;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Kriteria Styling */
+.kriteria-header {
+    display: grid;
+    grid-template-columns: auto 2fr 1fr 1fr;
+    gap: 15px;
+    align-items: center;
+}
+
+.kriteria-header select {
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+/* Range Nilai Styling */
+.range-nilai {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.range-inputs input {
+    width: 80px;
+}
+
+.range-inputs span {
+    color: var(--text-color);
+}
+
+.nilai-descriptions {
+    margin-top: 10px;
+}
+
+.nilai-description {
+    margin-bottom: 8px;
+}
+
+/* Button Styling */
+.submit-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #218838;
+}
+
+.submit-btn:disabled {
+    background: var(--border-color);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.add-criteria-btn {
+    background: var(--success-light);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.add-range-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    width: auto;
+    text-align: center;
+}
+
+.add-range-btn:hover {
+    background: var(--primary-dark);
+}
+
+.delete-btn {
+    background: var(--danger-light);
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    transition: background-color 0.3s;
+}
+
+.delete-btn:hover {
+    background: var(--danger-dark);
+}
+
+/* Description Group Styling */
+.desc-group {
+    display: grid;
+    grid-template-columns: auto 1fr 40px;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Total Bobot Display */
+.total-bobot {
+    margin: 20px 0;
+    padding: 10px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Dark Mode Styles */
+.dark-mode .form-section {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+}
+
+.dark-mode .tab-btn {
+    background-color: #404040;
+    color: #fff;
+}
+
+.dark-mode .tab-btn.active {
+    background-color: #007bff;
+}
+
+.dark-mode .form-group input,
+.dark-mode .form-group select,
+.dark-mode .form-group textarea {
+    background-color: #404040;
+    color: #fff;
+    border-color: #555;
+}
+
+.dark-mode .form-group,
+.dark-mode .range-nilai,
+.dark-mode .desc-group {
+    background: var(--card-bg-dark);
+    border-color: var(--border-dark);
+}
+
+.dark-mode input,
+.dark-mode select {
+    background: var(--bg-dark);
+    color: var(--text-dark);
+    border-color: var(--border-dark);
+}
+
+/* Dark Mode Styles untuk Bootstrap Modal */
+.dark-mode .modal {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .modal-content {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+    border: 1px solid var(--border-dark);
+}
+
+.dark-mode .modal-header,
+.dark-mode .modal-footer {
+    background-color: var(--card-bg-dark);
+    border-color: var(--border-dark);
+}
+
+.dark-mode .modal-body {
+    background-color: var(--bg-dark);
+}
+
+.dark-mode .modal-body .form-group {
+    background-color: var(--card-bg-dark);
+}
+
+/* Override Bootstrap's default white background */
+.dark-mode .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Pastikan background utama tetap gelap */
+.dark-mode {
+    background-color: var(--bg-dark) !important;
+}
+
+.dark-mode body,
+.dark-mode .main-content {
+    background-color: var(--bg-dark) !important;
+}
+
+/* Style untuk form elements dalam modal dark mode */
+.dark-mode .modal input,
+.dark-mode .modal select,
+.dark-mode .modal textarea {
+    background-color: var(--input-bg-dark);
+    color: var(--text-dark);
+    border-color: var(--border-dark);
+}
+
+/* Style untuk tombol dalam modal dark mode */
+.dark-mode .modal .btn-secondary {
+    background-color: var(--secondary-dark);
+    border-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+.dark-mode .modal .btn-primary {
+    background-color: var(--primary-dark);
+    border-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+.dark-mode .modal .close {
+    color: var(--text-dark);
+    text-shadow: none;
+}
+
+/* Modal styling */
+.modal-dialog {
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 60px);
+}
+
+.modal-content {
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+/* Scrollbar styling untuk modal */
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: var(--bg-color);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+/* Dark mode untuk modal */
+.dark-mode .modal-body::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+.dark-mode .modal-body::-webkit-scrollbar-thumb {
+    background: var(--border-dark);
+}
+
+/* Form dalam modal */
+.modal-body .form-group {
+    margin-bottom: 1rem;
+}
+
+.modal-body input,
+.modal-body select,
+.modal-body textarea {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+/* Modal footer selalu terlihat */
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+    padding: 1rem;
+    position: sticky;
+    bottom: 0;
+    background: inherit;
+}
+
+/* Dark mode adjustments */
+.dark-mode .modal-footer {
+    border-color: var(--border-dark);
 }

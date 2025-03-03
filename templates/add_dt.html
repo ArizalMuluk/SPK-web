@@ -83,9 +83,31 @@
                 <form action="/add/kriteria" method="POST">
                     <div class="dynamic-criteria">
                         <div class="form-group">
-                            <label>Kriteria 1:</label>
-                            <input type="text" name="kriteria_name[]" placeholder="Nama Kriteria" required>
-                            <input type="number" name="bobot[]" placeholder="Bobot (%)" required min="1" max="100">
+                            <div class="kriteria-header">
+                                <label>Kriteria 1:</label>
+                                <input type="text" name="kriteria_name[]" placeholder="Nama Kriteria" required>
+                                <input type="number" name="bobot[]" placeholder="Bobot (%)" required min="1" max="100" onchange="calculateTotalBobot()">
+                                <select name="jenis[]" required>
+                                    <option value="">Pilih Jenis</option>
+                                    <option value="benefit">Benefit</option>
+                                    <option value="cost">Cost</option>
+                                </select>
+                            </div>
+                            
+                            <div class="range-nilai">
+                                <label>Range Nilai:</label>
+                                <div class="range-inputs">
+                                    <input type="number" name="min_nilai[]" placeholder="Nilai Min" required min="1" max="10" onchange="validateRange(this)">
+                                    <span>sampai</span>
+                                    <input type="number" name="max_nilai[]" placeholder="Nilai Max" required min="1" max="10" onchange="validateRange(this)">
+                                </div>
+                                <button type="button" class="add-range-btn" onclick="addRangeField(this)">
+                                    Tambah Deskripsi Nilai
+                                </button>
+                                <div class="nilai-descriptions">
+                                    <!-- Deskripsi nilai akan ditambahkan di sini -->
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -149,182 +171,6 @@
     <button class="theme-toggle" id="themeToggle">
         <i class="fas fa-moon"></i>
     </button>
-
-    <style>
-        .form-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #f0f0f0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn.active {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .form-section {
-            display: none;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .form-section.active {
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        .submit-btn {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            background-color: #218838;
-        }
-
-        /* Dark mode styles */
-        .dark-mode .form-section {
-            background-color: #2c2c2c;
-            color: #fff;
-        }
-
-        .dark-mode .tab-btn {
-            background-color: #404040;
-            color: #fff;
-        }
-
-        .dark-mode .tab-btn.active {
-            background-color: #007bff;
-        }
-
-        .dark-mode .form-group input,
-        .dark-mode .form-group select,
-        .dark-mode .form-group textarea {
-            background-color: #404040;
-            color: #fff;
-            border-color: #555;
-        }
-
-        /* Styling untuk matriks perbandingan */
-        .comparison-matrix {
-            margin: 20px 0;
-            padding: 20px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-        }
-
-        .matrix-container {
-            overflow-x: auto;
-        }
-
-        .matrix-container table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .matrix-container th,
-        .matrix-container td {
-            padding: 10px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .matrix-container input {
-            width: 60px;
-            text-align: center;
-        }
-
-        /* Styling untuk tombol tambah */
-        .add-criteria-btn {
-            background: var(--success-light);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .dynamic-criteria {
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .form-group input,
-        .form-group select {
-            flex: 1;
-        }
-
-        .total-bobot {
-            margin: 20px 0;
-            padding: 10px;
-            background: var(--primary-color);
-            color: white;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .remove-btn {
-            background: var(--danger-light);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-
-        .form-group {
-            display: grid;
-            grid-template-columns: 100px 2fr 1fr 1fr auto;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-    </style>
 
     <script>
         // Toggle Sidebar
@@ -406,16 +252,93 @@
             const newField = document.createElement('div');
             newField.className = 'form-group';
             newField.innerHTML = `
-                <label>Kriteria ${criteriaCount}:</label>
-                <input type="text" name="kriteria_name[]" placeholder="Nama Kriteria" required>
-                <input type="number" name="bobot[]" placeholder="Bobot (%)" required min="1" max="100" onchange="calculateTotalBobot()">
-                <button type="button" class="remove-btn" onclick="removeCriteria(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="kriteria-header">
+                    <label>Kriteria ${criteriaCount}:</label>
+                    <input type="text" name="kriteria_name[]" placeholder="Nama Kriteria" required>
+                    <input type="number" name="bobot[]" placeholder="Bobot (%)" required min="1" max="100" onchange="calculateTotalBobot()">
+                    <select name="jenis[]" required>
+                        <option value="">Pilih Jenis</option>
+                        <option value="benefit">Benefit</option>
+                        <option value="cost">Cost</option>
+                    </select>
+                </div>
+                
+                <div class="range-nilai">
+                    <label>Range Nilai:</label>
+                    <div class="range-inputs">
+                        <input type="number" name="min_nilai[]" placeholder="Nilai Min" required min="1" max="10" onchange="validateRange(this)">
+                        <span>sampai</span>
+                        <input type="number" name="max_nilai[]" placeholder="Nilai Max" required min="1" max="10" onchange="validateRange(this)">
+                    </div>
+                    <button type="button" class="add-range-btn" onclick="addRangeField(this)">
+                        Tambah Deskripsi Nilai
+                    </button>
+                    <div class="nilai-descriptions">
+                        <!-- Deskripsi nilai akan ditambahkan di sini -->
+                    </div>
+                </div>
+                
+                <button type="button" class="delete-btn" onclick="removeCriteria(this)">-</button>
             `;
             
             container.appendChild(newField);
             calculateTotalBobot();
+        }
+
+        function validateRange(input) {
+            const rangeDiv = input.closest('.range-inputs');
+            const minInput = rangeDiv.querySelector('[name="min_nilai[]"]');
+            const maxInput = rangeDiv.querySelector('[name="max_nilai[]"]');
+            const descContainer = input.closest('.range-nilai').querySelector('.nilai-descriptions');
+            
+            if (parseInt(minInput.value) > parseInt(maxInput.value)) {
+                alert('Nilai minimum tidak boleh lebih besar dari nilai maksimum');
+                input.value = '';
+                return;
+            }
+            
+            // Reset deskripsi nilai ketika range berubah
+            descContainer.innerHTML = '';
+        }
+
+        function addRangeField(btn) {
+            const container = btn.nextElementSibling;
+            const rangeInputs = btn.previousElementSibling;
+            const minInput = rangeInputs.querySelector('[name="min_nilai[]"]');
+            const maxInput = rangeInputs.querySelector('[name="max_nilai[]"]');
+            
+            const minVal = parseInt(minInput.value);
+            const maxVal = parseInt(maxInput.value);
+            
+            if (!minVal || !maxVal) {
+                alert('Harap isi nilai minimum dan maksimum terlebih dahulu');
+                return;
+            }
+            
+            const currentCount = container.children.length;
+            const nextValue = minVal + currentCount;
+            
+            if (nextValue <= maxVal) {
+                const newField = document.createElement('div');
+                newField.className = 'nilai-description';
+                newField.innerHTML = `
+                    <div class="desc-group">
+                        <label>Deskripsi untuk nilai ${nextValue}:</label>
+                        <input type="text" 
+                               name="nilai_desc_${currentCount}[]" 
+                               placeholder="Contoh: Sangat Baik"
+                               required>
+                        <button type="button" class="delete-btn" onclick="removeDescription(this)">-</button>
+                    </div>
+                `;
+                container.appendChild(newField);
+            } else {
+                alert('Semua nilai dalam range sudah memiliki deskripsi');
+            }
+        }
+
+        function removeDescription(btn) {
+            btn.closest('.nilai-description').remove();
         }
 
         function removeCriteria(btn) {

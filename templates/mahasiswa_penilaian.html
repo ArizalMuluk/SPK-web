@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penilaian Dosen - SPK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='mahasiswa_style.css') }}">
+</head>
+<body>
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>SPK Dashboard</h3>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/mahasiswa" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/mahasiswa/penilaian" class="menu-item active">
+                <i class="fas fa-star"></i>
+                <span>Penilaian Dosen</span>
+            </a>
+            <a href="/mahasiswa/aspirasi" class="menu-item">
+                <i class="fas fa-comment"></i>
+                <span>Aspirasi</span>
+            </a>
+            <a href="/mahasiswa/hasil" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Hasil Penilaian</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="content-header">
+            <h2 class="page-title">Penilaian Dosen</h2>
+            <div class="user-info">
+                <span>Selamat datang, <strong>{{ username }}</strong></span>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="flash-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Form Penilaian -->
+        <div class="card">
+            <h3 class="card-title"><i class="fas fa-plus-circle"></i> Tambah Penilaian</h3>
+            <div class="card-content">
+                <form action="/mahasiswa/penilaian/add" method="POST" class="penilaian-form">
+                    <div class="form-group">
+                        <label for="dosen">Pilih Dosen:</label>
+                        <select name="dosen" id="dosen" required>
+                            <option value="">Pilih Dosen</option>
+                            {% for dosen in dosen_list %}
+                                <option value="{{ dosen[0] }}">{{ dosen[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    {% for kriteria in kriteria_list %}
+                    <div class="form-group">
+                        <label for="nilai_{{ kriteria[0] }}">{{ kriteria[1] }}:</label>
+                        <div class="rating">
+                            <input type="radio" name="nilai_{{ kriteria[0] }}" value="1" required> 1
+                            <input type="radio" name="nilai_{{ kriteria[0] }}" value="2"> 2
+                            <input type="radio" name="nilai_{{ kriteria[0] }}" value="3"> 3
+                            <input type="radio" name="nilai_{{ kriteria[0] }}" value="4"> 4
+                            <input type="radio" name="nilai_{{ kriteria[0] }}" value="5"> 5
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <button type="submit" class="submit-btn">Simpan Penilaian</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Riwayat Penilaian -->
+        <div class="card">
+            <h3 class="card-title"><i class="fas fa-history"></i> Riwayat Penilaian</h3>
+            <div class="card-content">
+                {% if penilaian_existing %}
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Dosen</th>
+                                <th>Kriteria</th>
+                                <th>Nilai</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for penilaian in penilaian_existing %}
+                            <tr>
+                                <td>{{ penilaian[0] }}</td>
+                                <td>{{ penilaian[1] }}</td>
+                                <td>{{ penilaian[2] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p>Belum ada riwayat penilaian.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <style>
+        .penilaian-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .rating {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        .rating input[type="radio"] {
+            margin-right: 5px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+        }
+
+        .data-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* Dark mode styles */
+        .dark-mode .data-table th {
+            background-color: #2c2c2c;
+        }
+
+        .dark-mode .data-table td {
+            border-bottom-color: #444;
+        }
+
+        .dark-mode .data-table tr:hover {
+            background-color: #383838;
+        }
+    </style>
+
+    <script>
+        // Toggle Sidebar
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleButton = this;
+            const icon = toggleButton.querySelector('i');
+            
+            sidebar.classList.toggle('active');
+            mainContent.classList.toggle('sidebar-active');
+            toggleButton.classList.toggle('active');
+            
+            if (sidebar.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        body.classList.add(`${savedTheme}-mode`);
+        
+        if (savedTheme === 'dark') {
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('light-mode')) {
+                body.classList.replace('light-mode', 'dark-mode');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                body.classList.replace('dark-mode', 'light-mode');
+                localStorage.setItem('theme', 'light');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
+    </script>
+</body>
+</html> 

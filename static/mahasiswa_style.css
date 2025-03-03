@@ -1,0 +1,293 @@
+Gaya Dasar
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 250px;
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    box-shadow: var(--shadow);
+    transition: 0.3s;
+    z-index: 1000;
+}
+
+.dark-mode .sidebar {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    color: var(--sidebar-text-light);
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    margin: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+}
+
+.menu-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-left: 3px solid var(--accent-light);
+}
+
+.menu-item.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border-left: 3px solid var(--accent-light);
+}
+
+.menu-item i {
+    margin-right: 12px;
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+}
+
+/* Konten Utama */
+.main-content {
+    margin-left: 250px;
+    padding: 30px;
+    transition: 0.3s;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.page-title {
+    color: var(--text-color);
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: var(--text-color);
+}
+
+.logout-btn {
+    padding: 10px 20px;
+    border-radius: 20px;
+    background: linear-gradient(45deg, var(--danger-light) 0%, var(--secondary-light) 100%);
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+}
+
+.logout-btn:hover {
+    background: linear-gradient(45deg, var(--secondary-light) 0%, var(--danger-light) 100%);
+    transform: translateY(-2px);
+}
+
+/* Kartu */
+.card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    border-color: var(--secondary-light);
+}
+
+.card-title {
+    color: var(--primary-color);
+    font-size: 18px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+select, input, textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(45deg, var(--primary-light) 0%, var(--secondary-light) 100%);
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(45deg, var(--secondary-light) 0%, var(--primary-light) 100%);
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+}
+
+/* Flash Messages */
+.flash-message {
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.flash-success {
+    background: linear-gradient(45deg, var(--success-light) 0%, var(--primary-light) 100%);
+    color: white;
+}
+
+.flash-error {
+    background: linear-gradient(45deg, var(--danger-light) 0%, var(--secondary-light) 100%);
+    color: white;
+}
+
+/* Toggle Buttons */
+.sidebar-toggle,
+.theme-toggle {
+    position: fixed;
+    padding: 10px;
+    border-radius: 8px;
+    background: linear-gradient(45deg, var(--primary-light) 0%, var(--secondary-light) 100%);
+    border: none;
+    cursor: pointer;
+    color: white;
+    z-index: 1001;
+    display: none;
+}
+
+.sidebar-toggle {
+    left: 20px;
+    top: 20px;
+}
+
+.theme-toggle {
+    right: 20px;
+    bottom: 20px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+/* Penyesuaian Form Penilaian */
+.penilaian-form {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.rating {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+/* Dark Mode */
+.dark-mode .card,
+.dark-mode .penilaian-form {
+    background: var(--card-bg-dark);
+}
+
+.dark-mode select,
+.dark-mode input,
+.dark-mode textarea {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-250px);
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+    }
+    
+    .sidebar-toggle {
+        display: block;
+    }
+    
+    .content-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .user-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+} 

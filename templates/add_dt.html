@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Data - SPK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>SPK Dashboard</h3>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/data" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Lihat Data</span>
+            </a>
+            <a href="/add" class="menu-item active">
+                <i class="fas fa-plus-circle"></i>
+                <span>Tambah Data</span>
+            </a>
+            <a href="/calculation" class="menu-item">
+                <i class="fas fa-calculator"></i>
+                <span>Perhitungan</span>
+            </a>
+            <a href="/analysis" class="menu-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Hasil Analisis</span>
+            </a>
+            <a href="/settings" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Pengaturan</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="content-header">
+            <h2 class="page-title">Tambah Data</h2>
+            <div class="user-info">
+                <span>Selamat datang, <strong>{{ username }}</strong></span>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="flash-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Form Tabs -->
+        <div class="form-tabs">
+            <button class="tab-btn active" onclick="showForm('kriteria')">Kriteria & Bobot</button>
+            <button class="tab-btn" onclick="showForm('alternatif')">Alternatif</button>
+            <button class="tab-btn" onclick="showForm('users')">Manajemen User</button>
+        </div>
+
+        <!-- Form Containers -->
+        <div class="form-containers">
+            <!-- Form Kriteria & Bobot -->
+            <div id="kriteriaForm" class="form-section active">
+                <h3>Pengaturan Kriteria dan Bobot</h3>
+                <form action="/add/kriteria" method="POST">
+                    <div class="dynamic-criteria">
+                        <div class="form-group">
+                            <label>Kriteria 1:</label>
+                            <input type="text" name="kriteria_name[]" placeholder="Nama Kriteria" required>
+                            <input type="number" name="bobot[]" placeholder="Bobot (%)" required min="1" max="100">
+                        </div>
+                    </div>
+
+                    <button type="button" class="add-criteria-btn" onclick="addCriteriaField()">
+                        <i class="fas fa-plus"></i> Tambah Kriteria
+                    </button>
+
+                    <div class="total-bobot">
+                        Total Bobot: <span id="totalBobot">0</span>%
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn" disabled>Simpan Kriteria</button>
+                </form>
+            </div>
+
+            <!-- Form Alternatif (Dosen) -->
+            <div id="alternatifForm" class="form-section">
+                <h3>Manajemen Data Dosen</h3>
+                <form action="/add/dosen" method="POST">
+                    <div class="form-group">
+                        <label for="nama_dosen">Nama Dosen:</label>
+                        <input type="text" name="nama_dosen" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nid">NID:</label>
+                        <input type="text" name="nid" id="nid" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="matkul">Mata Kuliah:</label>
+                        <input type="text" name="matkul" id="matkul" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Simpan Data Dosen</button>
+                </form>
+            </div>
+
+            <!-- Form Manajemen User -->
+            <div id="usersForm" class="form-section">
+                <h3>Manajemen User</h3>
+                <form action="/add/user" method="POST">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Role:</label>
+                        <select name="role" required>
+                            <option value="admin">Admin</option>
+                            <option value="mahasiswa">Mahasiswa</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="submit-btn">Tambah User</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <style>
+        .form-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .form-section {
+            display: none;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .submit-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Dark mode styles */
+        .dark-mode .form-section {
+            background-color: #2c2c2c;
+            color: #fff;
+        }
+
+        .dark-mode .tab-btn {
+            background-color: #404040;
+            color: #fff;
+        }
+
+        .dark-mode .tab-btn.active {
+            background-color: #007bff;
+        }
+
+        .dark-mode .form-group input,
+        .dark-mode .form-group select,
+        .dark-mode .form-group textarea {
+            background-color: #404040;
+            color: #fff;
+            border-color: #555;
+        }
+
+        /* Styling untuk matriks perbandingan */
+        .comparison-matrix {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+
+        .matrix-container {
+            overflow-x: auto;
+        }
+
+        .matrix-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .matrix-container th,
+        .matrix-container td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .matrix-container input {
+            width: 60px;
+            text-align: center;
+        }
+
+        /* Styling untuk tombol tambah */
+        .add-criteria-btn {
+            background: var(--success-light);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dynamic-criteria {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .form-group input,
+        .form-group select {
+            flex: 1;
+        }
+
+        .total-bobot {
+            margin: 20px 0;
+            padding: 10px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .remove-btn {
+            background: var(--danger-light);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: 100px 2fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <script>
+        // Toggle Sidebar
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleButton = this;
+            const icon = toggleButton.querySelector('i');
+            
+            sidebar.classList.toggle('active');
+            mainContent.classList.toggle('sidebar-active');
+            toggleButton.classList.toggle('active');
+            
+            if (sidebar.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Form Tab Switching
+        function showForm(formId) {
+            // Hide all forms
+            document.querySelectorAll('.form-section').forEach(form => {
+                form.classList.remove('active');
+            });
+            
+            // Show selected form
+            document.getElementById(formId + 'Form').classList.add('active');
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        body.classList.add(`${savedTheme}-mode`);
+        
+        if (savedTheme === 'dark') {
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('light-mode')) {
+                body.classList.replace('light-mode', 'dark-mode');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                body.classList.replace('dark-mode', 'light-mode');
+                localStorage.setItem('theme', 'light');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
+
+        let range_nilai = 5; // Default range
+
+        function updateKriteriaFields() {
+            range_nilai = parseInt(document.getElementById('range_nilai').value);
+            // Update placeholder dan validasi untuk field yang sudah ada
+            document.querySelectorAll('input[name="bobot[]"]').forEach(input => {
+                input.max = 100;
+            });
+        }
+
+        function addCriteriaField() {
+            const container = document.querySelector('.dynamic-criteria');
+            const criteriaCount = container.children.length + 1;
+            
+            const newField = document.createElement('div');
+            newField.className = 'form-group';
+            newField.innerHTML = `
+                <label>Kriteria ${criteriaCount}:</label>
+                <input type="text" name="kriteria_name[]" placeholder="Nama Kriteria" required>
+                <input type="number" name="bobot[]" placeholder="Bobot (%)" required min="1" max="100" onchange="calculateTotalBobot()">
+                <button type="button" class="remove-btn" onclick="removeCriteria(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            
+            container.appendChild(newField);
+            calculateTotalBobot();
+        }
+
+        function removeCriteria(btn) {
+            btn.closest('.form-group').remove();
+            calculateTotalBobot();
+        }
+
+        function calculateTotalBobot() {
+            const bobotInputs = document.querySelectorAll('input[name="bobot[]"]');
+            let total = 0;
+            
+            bobotInputs.forEach(input => {
+                total += parseInt(input.value) || 0;
+            });
+            
+            document.getElementById('totalBobot').textContent = total;
+            document.getElementById('submitBtn').disabled = total !== 100;
+            
+            if (total > 100) {
+                alert('Total bobot tidak boleh melebihi 100%');
+            }
+        }
+    </script>
+</body>
+</html>

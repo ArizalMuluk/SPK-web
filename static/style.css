@@ -789,16 +789,35 @@ table.dataTable {
     width: 100% !important;
 }
 
+/* Dark mode untuk isi tabel */
+.dark-mode table.dataTable tbody tr {
+    background-color: #2d2d2d !important;  /* Warna background lebih gelap */
+}
+
+.dark-mode table.dataTable tbody td {
+    color: #ffffff !important;  /* Memastikan teks berwarna putih */
+    background-color: #2d2d2d !important;  /* Background untuk sel */
+}
+
+/* Warna header tabel */
 table.dataTable thead th {
     background: var(--primary-color);
     color: white;
     border: none;
-    padding: 12px;
 }
 
-table.dataTable tbody td {
-    padding: 12px;
-    border-bottom: 1px solid var(--border-color);
+/* Hover state untuk baris */
+.dark-mode table.dataTable tbody tr:hover {
+    background-color: #3d3d3d !important;  /* Warna hover sedikit lebih terang */
+}
+
+/* Stripe untuk baris ganjil/genap */
+.dark-mode table.dataTable.stripe tbody tr.odd {
+    background-color: #2d2d2d !important;
+}
+
+.dark-mode table.dataTable.stripe tbody tr.even {
+    background-color: #333333 !important;
 }
 
 .btn-edit, .btn-delete {

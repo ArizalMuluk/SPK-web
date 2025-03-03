@@ -84,6 +84,13 @@ CREATE TABLE tbl_penilaian (
     FOREIGN KEY (id_dosen) REFERENCES tbl_dosen(id_dosen),
     FOREIGN KEY (id_kriteria) REFERENCES tbl_kriteria(id_kriteria)
 );
+
+CREATE TABLE tbl_admin (
+    id_admin INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) DEFAULT 'admin'
+);
 ```
 
 ### 5. Run the Application

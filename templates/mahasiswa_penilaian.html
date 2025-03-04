@@ -80,12 +80,11 @@
                     <div class="form-group">
                         <label for="nilai_{{ kriteria[0] }}">{{ kriteria[1] }}:</label>
                         <div class="rating">
-                            <input type="radio" name="nilai_{{ kriteria[0] }}" value="1" required> 1
-                            <input type="radio" name="nilai_{{ kriteria[0] }}" value="2"> 2
-                            <input type="radio" name="nilai_{{ kriteria[0] }}" value="3"> 3
-                            <input type="radio" name="nilai_{{ kriteria[0] }}" value="4"> 4
-                            <input type="radio" name="nilai_{{ kriteria[0] }}" value="5"> 5
+                            {% for nilai in range(kriteria[2], kriteria[3] + 1) %}
+                                <input type="radio" name="nilai_{{ kriteria[0] }}" value="{{ nilai }}" required> {{ nilai }}
+                            {% endfor %}
                         </div>
+                        <p id="deskripsi_{{ kriteria[0] }}"></p>
                     </div>
                     {% endfor %}
 
@@ -231,6 +230,29 @@
                 localStorage.setItem('theme', 'light');
                 themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
             }
+        });
+
+        function updateDeskripsi(kriteriaId, nilai) {
+            fetch(`/get_deskripsi_nilai/${kriteriaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const deskripsi = data.find(item => item.nilai === parseInt(nilai));
+                    if (deskripsi) {
+                        document.getElementById(`deskripsi_${kriteriaId}`).textContent = deskripsi.deskripsi;
+                    } else {
+                        document.getElementById(`deskripsi_${kriteriaId}`).textContent = '';
+                    }
+                });
+        }
+    
+        // Tambahkan event listener untuk setiap radio button
+        const radioButtons = document.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach(button => {
+            button.addEventListener('change', function() {
+                const kriteriaId = this.name.split('_')[1];
+                const nilai = this.value;
+                updateDeskripsi(kriteriaId, nilai);
+            });
         });
     </script>
 </body>

@@ -223,7 +223,7 @@ def view_data():
     cursor.execute(
         """
         SELECT p.id_penilaian, m.nim, d.nama as nama_dosen, 
-               k.nama_kriteria, p.nilai
+            k.nama_kriteria, p.nilai
         FROM tbl_penilaian p
         JOIN tbl_mahasiswa m ON p.id_mahasiswa = m.id_mahasiswa
         JOIN tbl_dosen d ON p.id_dosen = d.id_dosen
@@ -370,8 +370,8 @@ def add_kriteria():
         ):
             cursor.execute(
                 """INSERT INTO tbl_kriteria 
-                   (nama_kriteria, bobot, jenis, min_nilai, max_nilai) 
-                   VALUES (%s, %s, %s, %s, %s)""",
+                (nama_kriteria, bobot, jenis, min_nilai, max_nilai) 
+                VALUES (%s, %s, %s, %s, %s)""",
                 (name, float(bobot) / 100, jenis, min_val, max_val),
             )
             kriteria_id = cursor.lastrowid
@@ -382,8 +382,8 @@ def add_kriteria():
                 if deskripsi:
                     cursor.execute(
                         """INSERT INTO tbl_nilai_deskripsi 
-                           (id_kriteria, nilai, deskripsi) 
-                           VALUES (%s, %s, %s)""",
+                        (id_kriteria, nilai, deskripsi) 
+                        VALUES (%s, %s, %s)""",
                         (kriteria_id, nilai, deskripsi),
                     )
 
@@ -467,8 +467,8 @@ def mahasiswa_penilaian():
     cursor.execute("SELECT id_dosen, nama FROM tbl_dosen")
     dosen_list = cursor.fetchall()
 
-    # Ambil daftar kriteria
-    cursor.execute("SELECT id_kriteria, nama_kriteria FROM tbl_kriteria")
+    # Ambil daftar kriteria dengan min_nilai dan max_nilai
+    cursor.execute("SELECT id_kriteria, nama_kriteria, min_nilai, max_nilai FROM tbl_kriteria")
     kriteria_list = cursor.fetchall()
 
     # Ambil penilaian yang sudah diberikan
@@ -492,7 +492,7 @@ def mahasiswa_penilaian():
         "mahasiswa_penilaian.html",
         username=session.get("username"),
         dosen_list=dosen_list,
-        kriteria_list=kriteria_list,
+        kriteria_list=kriteria_list,  # Mengirim kriteria_list yang sudah dimodifikasi
         penilaian_existing=penilaian_existing,
     )
 
